@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Places from "./Places.jsx";
 import Error from "./Error.jsx";
 import { sortPlacesByDistance } from "../loc.js";
+import { fetchAvailablePlaces } from "../http.js";
 
 export default function AvailablePlaces({ onSelectPlace }) {
   const [isFetching, setIsFetching] = useState(false);
@@ -16,21 +17,13 @@ export default function AvailablePlaces({ onSelectPlace }) {
       setIsFetching(true);
 
       try {
-        // Attempt to fetch data from the backend API
-        const response = await fetch("http://localhost:3000/places");
-        const resData = await response.json();
-
-        // Manually throw an error if the response status is not OK (e.g., 404 or 500)
-        if (!response.ok) {
-          throw new Error("Failed to fetch places.");
-        }
-
+        const places = await fetchAvailablePlaces();
         // Attempt to get the user's current location using the Geolocation API
         // If successful, sort the places based on distance to the user
         navigator.geolocation.getCurrentPosition(
           (position) => {
             const sortedPlaces = sortPlacesByDistance(
-              resData.places,
+              places,
               position.coords.latitude,
               position.coords.longitude
             );
@@ -39,7 +32,7 @@ export default function AvailablePlaces({ onSelectPlace }) {
           },
           () => {
             // If location access fails (e.g., user denies it), just use unsorted data
-            setAvailablePlaces(resData.places);
+            setAvailablePlaces(places);
             setIsFetching(false);
           }
         );
