@@ -5,6 +5,15 @@ import Places from "./Places.jsx";
 export default function AvailablePlaces({ onSelectPlace }) {
   const [availablePlaces, setAvailablePlaces] = useState([]);
 
+  // Fetch the list of places from the server when the component renders
+  fetch("http://localhost:3000/places")
+    .then((response) => {
+      return response.json();
+    })
+    .then((resData) => {
+      setAvailablePlaces(resData.places); // Update state with the fetched places
+    });
+
   return (
     <Places
       title="Available Places"
