@@ -8,14 +8,13 @@ export default function AvailablePlaces({ onSelectPlace }) {
   // Wrap fetch in useEffect to run it only once after the initial render,
   // avoiding repeated fetches and potential infinite loops caused by state updates
   useEffect(() => {
-    // Fetch the list of places from the server when the component renders
-    fetch("http://localhost:3000/places")
-      .then((response) => {
-        return response.json();
-      })
-      .then((resData) => {
-        setAvailablePlaces(resData.places); // Update state with the fetched places
-      });
+    async function fetchPlaces() {
+      const response = await fetch("http://localhost:3000/places");
+      const resData = await response.json();
+      setAvailablePlaces(resData.places); // Update state with the fetched places
+    }
+
+    fetchPlaces();
   }, []);
 
   return (
