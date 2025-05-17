@@ -11,6 +11,7 @@ function App() {
   const selectedPlace = useRef();
 
   const [userPlaces, setUserPlaces] = useState([]);
+  const [errorUpdatingPlaces, setErrorUpdatingPlaces] = useState();
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
@@ -18,12 +19,12 @@ function App() {
     setModalIsOpen(true);
     selectedPlace.current = place;
   }
-
   function handleStopRemovePlace() {
     setModalIsOpen(false);
   }
 
   async function handleSelectPlace(selectedPlace) {
+    // optimistic updating
     setUserPlaces((prevPickedPlaces) => {
       if (!prevPickedPlaces) {
         prevPickedPlaces = [];
@@ -37,7 +38,12 @@ function App() {
     try {
       await updateUserPlaces([selectedPlace, ...userPlaces]);
     } catch (error) {
-      // handle error
+      // Revert to the previous state if the update fails (basic rollback)
+      setUserPlaces(userPlaces);
+      setErrorUpdatingPlaces({
+        // Store error info to display an error message or fallback UI
+        message: error.message || "Failed to update places.",
+      });
     }
   }
 
